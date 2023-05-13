@@ -2,53 +2,12 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import multer from "multer";
-import { createFFmpeg } from "@ffmpeg/ffmpeg";
 import PQueue from "p-queue";
 import { processVideoToImage } from "./ffmpeg.mjs";
-
-function parseCommand(command) {
-  const regex = /-i\s+([^ ]+).*\s+(\S+)$/;
-  const matches = command.match(regex);
-
-  if (matches) {
-    const inputFileName = matches[1];
-    const outputFileName = matches[2];
-    return { inputFileName, outputFileName };
-  } else {
-    // Return null or throw an error if the input format is not as expected
-    return null;
-  }
-}
-
-const tempCommand = [
-  "-ss",
-  "00:00:01.000",
-  "-i",
-  "input.mov",
-  "-frames:v",
-  "1",
-  "output.png",
-].join(" ");
-const tempCommand2 = tempCommand.split(" ");
-// console.log("tempCommand", tempCommand, "tempCommand2", tempCommand2);
-
-// console.log("Input File Name:", inputFileName);
-// console.log("Output File Name:", outputFileName);
-
-const ffmpegInstance = createFFmpeg({ log: true });
-let ffmpegLoadingPromise = ffmpegInstance.load();
+import { parseCommand } from "./utils.mjs";
+import { log } from "console";
 
 const requestQueue = new PQueue({ concurrency: 1 });
-
-async function getFFmpeg() {
-  if (ffmpegLoadingPromise) {
-    await ffmpegLoadingPromise;
-    ffmpegLoadingPromise = undefined;
-  }
-
-  return ffmpegInstance;
-}
-
 const app = express();
 const port = 3000;
 
@@ -65,51 +24,29 @@ app.post("/thumbnail", upload.single("video"), async (req, res) => {
   // try {
   const videoData = req.file.buffer;
   const commandCSV = req.body.command.split(",");
-  console.log("commandCSV", commandCSV);
-  const arrayWithoutSpaces = commandCSV.map((item) =>
-    item
-      .replace(
-        /'([^']+)'|"([^"]+)"/g,
-        (match, singleQuotes, doubleQuotes) => singleQuotes || doubleQuotes
-      )
-      .trim()
+
+  const { parsedCommand, inputFile, outputFile } = await parseCommand(
+    commandCSV
   );
-  console.log("arrayWithoutSpaces: ", arrayWithoutSpaces);
-  const indexToRemove = arrayWithoutSpaces.indexOf("-i");
+  // console.log(
+  //   "parsedCommand",
+  //   parsedCommand,
+  //   "inputFile: ",
+  //   inputFile,
+  //   "outputFile: ",
+  //   outputFile
+  // );
 
-  const slice1 = arrayWithoutSpaces.slice(0, indexToRemove);
-  const slice2 = arrayWithoutSpaces.slice(indexToRemove + 2);
-  const slice3 = slice2.slice(0, -1);
-  console.log("slice1", slice1, "slice2", slice2, "slice3", slice3);
-  const spreadSlices1And3 = [...slice1, ...slice3];
-  console.log("spreadSlices1And3", spreadSlices1And3);
-  let inputFile, outputFile;
-
-  for (let i = 0; i < arrayWithoutSpaces.length; i++) {
-    if (arrayWithoutSpaces[i] === "-i" && i < arrayWithoutSpaces.length - 1) {
-      inputFile = arrayWithoutSpaces[i + 1];
-    }
-    if (i === arrayWithoutSpaces.length - 1) {
-      outputFile = arrayWithoutSpaces[i];
-    }
-  }
-
-  const spreadFilesAndSlices = [
-    ...spreadSlices1And3,
-    "-i",
-    inputFile,
-    outputFile,
-  ];
-  console.log("spreadFilesAndSlices", spreadFilesAndSlices);
+  // console.log("spreadFilesAndSlices", spreadFilesAndSlices);
   // const joinSpreadFilesAndSlices = spreadFilesAndSlices.join(" ");
   // console.log("joinSpreadFilesAndSlices", joinSpreadFilesAndSlices);
-  console.log("spreadFilesAndSlices", ...spreadFilesAndSlices);
+  // console.log("spreadFilesAndSlices", ...spreadFilesAndSlices);
   // console.log("Input File:", inputFile);
   // console.log("Output File:", outputFile);
   // let spreadArray = [...arrayWithoutSpaces, "-i", inputFile, outputFile];
   // console.log("spreadArray", spreadArray);
 
-  await processVideoToImage(spreadFilesAndSlices);
+  await processVideoToImage({ parsedCommand, inputFile, outputFile });
 
   // const commandString = commandCSV.join(" ");
   // console.log("commandCSV", commandCSV, "commandString", commandString);
