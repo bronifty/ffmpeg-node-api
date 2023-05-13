@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 import multer from "multer";
 import { createFFmpeg } from "@ffmpeg/ffmpeg";
 import PQueue from "p-queue";
@@ -27,10 +28,8 @@ const upload = multer({
 });
 
 app.use(cors());
-
-app.use("/", express.static("public"));
-
-// app.use("/", express.static(path.resolve(__dirname, "public")));
+// to host the static resources (index.html, client.js, etc.) at the root of the project dir; if you wanted to put it in the "public" folder, just add the word "public" in the quotations after process.cwd(), like so: app.use(express.static(path.join(process.cwd(), "public")));
+app.use(express.static(path.join(process.cwd(), "")));
 
 app.post("/thumbnail", upload.single("video"), async (req, res) => {
   try {
