@@ -33,47 +33,47 @@ export async function processVideoToImage({
   }
 
   const ffmpeg = await getFFmpeg();
-  // ffmpeg.FS(
-  //   "writeFile",
-  //   inputFile,
-  //   await fetchFile(path.join(process.cwd(), "./input.mov"))
-  // );
   ffmpeg.FS(
     "writeFile",
-    "input.mov",
+    inputFile,
     await fetchFile(path.join(process.cwd(), "./input.mov"))
   );
-  // await ffmpeg.run(
-  //   "-ss",
-  //   "00:00:01.000",
-  //   "-i",
-  //   inputFileName,
-  //   "-frames:v",
-  //   "1",
-  //   outputFileName
+  // ffmpeg.FS(
+  //   "writeFile",
+  //   "input.mov",
+  //   await fetchFile(path.join(process.cwd(), "./input.mov"))
   // );
   await ffmpeg.run(
     "-ss",
     "00:00:01.000",
     "-i",
-    "input.mov",
+    inputFile,
     "-frames:v",
     "1",
-    "output-image.png"
+    outputFile
   );
-  // outputData = ffmpeg.FS("readFile", outputFileName);
-  outputData = ffmpeg.FS("readFile", "output-image.png");
-  // ffmpeg.FS("unlink", inputFileName);
-  // ffmpeg.FS("unlink", outputFileName);
-  ffmpeg.FS("unlink", "input.mov");
-  ffmpeg.FS("unlink", "output-image.png");
+  // await ffmpeg.run(
+  //   "-ss",
+  //   "00:00:01.000",
+  //   "-i",
+  //   "input.mov",
+  //   "-frames:v",
+  //   "1",
+  //   "output.png"
+  // );
+  outputData = ffmpeg.FS("readFile", outputFile);
+  // outputData = ffmpeg.FS("readFile", "output-image.png");
+  ffmpeg.FS("unlink", inputFile);
+  ffmpeg.FS("unlink", outputFile);
+  // ffmpeg.FS("unlink", "input.mov");
+  // ffmpeg.FS("unlink", "output-image.png");
 
   // console.log("outputData", outputData);
-  fs.writeFile(outputFileName, outputData, "binary", (err) => {
+  fs.writeFile(outputFile, outputData, "binary", (err) => {
     if (err) {
       console.error("Error writing the image file:", err);
     } else {
-      console.log("Image file saved successfully:", outputFileName);
+      console.log("Image file saved successfully:", outputFile);
     }
   });
 }
