@@ -2,7 +2,13 @@ import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import path from "path";
 import fs from "fs";
 
-export async function processVideoToImage() {
+export async function processVideoToImage(command) {
+  const inputFileName = `input-video`;
+  const outputFileName = `output-image.png`;
+  let outputData = null;
+
+  console.log("command", command);
+
   const ffmpegInstance = createFFmpeg({ log: true });
   let ffmpegLoadingPromise = ffmpegInstance.load();
 
@@ -13,10 +19,6 @@ export async function processVideoToImage() {
     }
     return ffmpegInstance;
   }
-
-  const inputFileName = `input-video`;
-  const outputFileName = `output-image.png`;
-  let outputData = null;
 
   const ffmpeg = await getFFmpeg();
   ffmpeg.FS(

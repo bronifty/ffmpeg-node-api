@@ -30,7 +30,7 @@ const tempCommand = [
   "output.png",
 ].join(" ");
 const tempCommand2 = tempCommand.split(" ");
-console.log("tempCommand", tempCommand, "tempCommand2", tempCommand2);
+// console.log("tempCommand", tempCommand, "tempCommand2", tempCommand2);
 
 // console.log("Input File Name:", inputFileName);
 // console.log("Output File Name:", outputFileName);
@@ -63,14 +63,56 @@ app.use(express.static(path.join(process.cwd(), "")));
 
 app.post("/thumbnail", upload.single("video"), async (req, res) => {
   // try {
+  const videoData = req.file.buffer;
+  const commandCSV = req.body.command.split(",");
+  console.log("commandCSV", commandCSV);
+  const arrayWithoutSpaces = commandCSV.map((item) =>
+    item
+      .replace(
+        /'([^']+)'|"([^"]+)"/g,
+        (match, singleQuotes, doubleQuotes) => singleQuotes || doubleQuotes
+      )
+      .trim()
+  );
+  console.log("arrayWithoutSpaces: ", arrayWithoutSpaces);
+  const indexToRemove = arrayWithoutSpaces.indexOf("-i");
 
-  await processVideoToImage();
+  const slice1 = arrayWithoutSpaces.slice(0, indexToRemove);
+  const slice2 = arrayWithoutSpaces.slice(indexToRemove + 2);
+  const slice3 = slice2.slice(0, -1);
+  console.log("slice1", slice1, "slice2", slice2, "slice3", slice3);
+  const spreadSlices1And3 = [...slice1, ...slice3];
+  console.log("spreadSlices1And3", spreadSlices1And3);
+  let inputFile, outputFile;
 
-  // const videoData = req.file.buffer;
-  // const commandCSV = req.body.command.split(",");
+  for (let i = 0; i < arrayWithoutSpaces.length; i++) {
+    if (arrayWithoutSpaces[i] === "-i" && i < arrayWithoutSpaces.length - 1) {
+      inputFile = arrayWithoutSpaces[i + 1];
+    }
+    if (i === arrayWithoutSpaces.length - 1) {
+      outputFile = arrayWithoutSpaces[i];
+    }
+  }
+
+  const spreadFilesAndSlices = [
+    ...spreadSlices1And3,
+    "-i",
+    inputFile,
+    outputFile,
+  ];
+  console.log("spreadFilesAndSlices", spreadFilesAndSlices);
+  // const joinSpreadFilesAndSlices = spreadFilesAndSlices.join(" ");
+  // console.log("joinSpreadFilesAndSlices", joinSpreadFilesAndSlices);
+  console.log("spreadFilesAndSlices", ...spreadFilesAndSlices);
+  // console.log("Input File:", inputFile);
+  // console.log("Output File:", outputFile);
+  // let spreadArray = [...arrayWithoutSpaces, "-i", inputFile, outputFile];
+  // console.log("spreadArray", spreadArray);
+
+  await processVideoToImage(spreadFilesAndSlices);
+
   // const commandString = commandCSV.join(" ");
   // console.log("commandCSV", commandCSV, "commandString", commandString);
-
   // // split the command string into array
   // const filterSpaces = customCommand.filter((item) => item !== ""); // filter out any empty strings
   // console.log("customCommand", filterSpaces);
@@ -79,7 +121,6 @@ app.post("/thumbnail", upload.single("video"), async (req, res) => {
   //   item.replace(/"(?=.*')/g, "")
   // );
   // console.log("newArray", newArray);
-
   // const { inputFileName, outputFileName } = parseCommand(newArray);
   // console.log(
   //   "Input File Name:",
@@ -87,23 +128,17 @@ app.post("/thumbnail", upload.single("video"), async (req, res) => {
   //   "Output File Name:",
   //   outputFileName
   // );
-
   //   const ffmpeg = await getFFmpeg();
-
   //   const inputFileName = `input-video`;
   //   const outputFileName = `output-image.png`;
   //   let outputData = null;
-
   //   await requestQueue.add(async () => {
   //     ffmpeg.FS("writeFile", inputFileName, videoData);
-
   //     await ffmpeg.run(...customCommand, inputFileName, outputFileName); // include custom command
-
   //     outputData = ffmpeg.FS("readFile", outputFileName);
   //     ffmpeg.FS("unlink", inputFileName);
   //     ffmpeg.FS("unlink", outputFileName);
   //   });
-
   //   res.writeHead(200, {
   //     "Content-Type": "image/png",
   //     "Content-Disposition": `attachment;filename=${outputFileName}`,
