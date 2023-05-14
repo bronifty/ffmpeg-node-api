@@ -7,13 +7,13 @@ export async function processVideoToImage({
   inputFile,
   outputFile,
 }) {
-  const inputFileName = `input-video`;
-  const outputFileName = `output-image.png`;
+  // const inputFileName = `input-video`;
+  // const outputFileName = `output-image.png`;
   let outputData = null;
 
-  console.log(
-    `in ffmpeg.mjs processVideoToImage; parsedCommand: "${parsedCommand}", inputFile: "${inputFile}", outputFile: "${outputFile}"`
-  );
+  // console.log(
+  //   `in ffmpeg.mjs processVideoToImage; parsedCommand: "${parsedCommand}", inputFile: "${inputFile}", outputFile: "${outputFile}"`
+  // );
 
   const ffmpegInstance = createFFmpeg({ log: true });
   let ffmpegLoadingPromise = ffmpegInstance.load();
@@ -39,21 +39,21 @@ export async function processVideoToImage({
   // );
 
   // await ffmpeg.run(parsedCommand);
-  let tempCommandString = `"-ss","00:00:01.000","-i","${inputFile}","-frames:v","1","${outputFile}"`;
-  console.log("tempCommandString", tempCommandString);
+  // let tempCommandString = `"-ss","00:00:01.000","-i","${inputFile}","-frames:v","1","${outputFile}"`;
+  // console.log("tempCommandString", tempCommandString);
 
   // await ffmpeg.run(tempCommandString);
-  const commandArray = [
-    "-ss",
-    "00:00:01.000",
-    "-i",
-    inputFile,
-    "-frames:v",
-    "1",
-    outputFile,
-  ];
+  // const commandArray = [
+  //   "-ss",
+  //   "00:00:01.000",
+  //   "-i",
+  //   inputFile,
+  //   "-frames:v",
+  //   "1",
+  //   outputFile,
+  // ];
   try {
-    await ffmpeg.run(...commandArray);
+    await ffmpeg.run(...parsedCommand);
   } catch (error) {
     console.log("error", error);
   }
