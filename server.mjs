@@ -42,7 +42,8 @@ app.post("/thumbnail", upload.single("video"), async (req, res) => {
       outputData = tempData;
     });
     res.writeHead(200, {
-      "Content-Type": "image/png",
+      "Content-Type": "video/mp4",
+      // "Content-Type": "image/png",
       "Content-Disposition": `attachment;filename=${outputFile}`,
       "Content-Length": outputData.length,
     });

@@ -19,7 +19,8 @@
       <input id="command-input" type="textarea" placeholder="Enter command" />
       <button id="submit">Submit</button>
       <div id="error"></div>
-      <img id="thumbnail" />
+      <img />
+      <video controls></video>
     </div>
     <!-- <script type="module" src="client.js"></script> -->
     <script>
@@ -29,8 +30,9 @@
       const fileInput = document.querySelector("#file-input");
       const commandInput = document.querySelector("#command-input");
       const submitButton = document.querySelector("#submit");
-      const thumbnailPreview = document.querySelector("#thumbnail");
       const errorDiv = document.querySelector("#error");
+      const imagePreview = document.querySelector("img");
+      const videoPreview = document.querySelector("video");
 
       function showError(msg) {
         errorDiv.innerText = `ERROR: ${msg}`;
@@ -46,7 +48,7 @@
         });
       }
 
-      async function createThumbnail(video, command) {
+      async function transformMedia(video, command) {
         const payload = new FormData();
         payload.append("video", video);
         payload.append("command", command);
@@ -60,10 +62,10 @@
           throw new Error("Creating thumbnail failed");
         }
 
-        const thumbnailBlob = await res.blob();
-        const thumbnail = await blobToDataURL(thumbnailBlob);
+        const mediaBlog = await res.blob();
+        const media = await blobToDataURL(mediaBlog);
 
-        return thumbnail;
+        return media;
       }
 
       submitButton.addEventListener("click", async () => {
@@ -73,8 +75,8 @@
           const file = files[0];
           const command = commandInput.value;
           try {
-            const thumbnail = await createThumbnail(file, command);
-            thumbnailPreview.src = thumbnail;
+            const media = await transformMedia(file, command);
+            videoPreview.src = media;
           } catch (error) {
             showError(error);
           }

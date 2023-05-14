@@ -1,6 +1,10 @@
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import path from "path";
 import fs from "fs";
+// order of args passed to ffmpeg.run() is important:
+// ffmpeg -ss <time> -i <input_file> -frames:v 1 <output_file>
+// -ss, 00:00:01.000, -i, input.mov, -frames:v, 1, output.png
+// "-i", "input.mov", "output.mp4"
 
 export async function processVideoToImage({
   parsedCommand,
