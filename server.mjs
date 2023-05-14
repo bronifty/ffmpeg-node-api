@@ -28,6 +28,9 @@ app.post("/thumbnail", upload.single("video"), async (req, res) => {
   const { parsedCommand, inputFile, outputFile } = await parseCommand(
     commandCSV
   );
+  console.log(
+    `[in server.mjs app.post] parsedCommand: ${parsedCommand} inputFile: ${inputFile} outputFile: ${outputFile}`
+  );
 
   await processVideoToImage({ parsedCommand, inputFile, outputFile });
 
