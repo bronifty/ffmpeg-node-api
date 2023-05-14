@@ -28,11 +28,7 @@ app.post("/thumbnail", upload.single("video"), async (req, res) => {
     const { parsedCommand, inputFile, outputFile } = await parseCommand(
       commandCSV
     );
-    console.log(
-      `[in server.mjs app.post] parsedCommand: ${parsedCommand} inputFile: ${inputFile} outputFile: ${outputFile}`
-    );
 
-    // going to replace inputFile variable name with actual file from the request and refer to the file by its name property inside the handler function
     await requestQueue.add(async () => {
       const { outputData: tempData } = await processVideoToImage({
         parsedCommand,
