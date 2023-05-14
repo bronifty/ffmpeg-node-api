@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ffmpeg.wasm</title>
+    <style>
+      #thumbnail {
+        max-width: 100%;
+      }
+      #command-input {
+        width: 100%;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input id="file-input" type="file" />
+      <input id="command-input" type="textarea" placeholder="Enter command" />
+      <button id="submit">Submit</button>
+      <div id="error"></div>
+      <img />
+      <video controls></video>
+    </div>
+    <!-- <script type="module" src="client.js"></script> -->
+    <script type="module">
+      import { blobToDataURL, transformMedia } from "./utils.mjs";
+      // const API_ENDPOINT = "http://localhost:3000/thumbnail";
+      let API_ENDPOINT = new URL("/thumbnail", document.location).href;
+
+      const fileInput = document.querySelector("#file-input");
+      const commandInput = document.querySelector("#command-input");
+      const submitButton = document.querySelector("#submit");
+      const errorDiv = document.querySelector("#error");
+      const imagePreview = document.querySelector("img");
+      const videoPreview = document.querySelector("video");
+
+      function showError(msg) {
+        errorDiv.innerText = `ERROR: ${msg}`;
+      }
+
+      submitButton.addEventListener("click", async () => {
+        const { files } = fileInput;
+
+        if (files.length > 0) {
+          const file = files[0];
+          const command = commandInput.value;
+          try {
+            const media = await transformMedia({
+              file,
+              command,
+              API_ENDPOINT,
+            });
+            videoPreview.src = media;
+          } catch (error) {
+            showError(error);
+          }
+        } else {
+          showError("Please select a file");
+        }
+      });
+    </script>
+  </body>
+</html>

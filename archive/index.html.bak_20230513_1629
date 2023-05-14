@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Create a Thumbnail from a Video</title>
+    <title>ffmpeg.wasm</title>
     <style>
       #thumbnail {
         max-width: 100%;
@@ -12,13 +12,14 @@
   <body>
     <div>
       <input id="file-input" type="file" />
-      <button id="submit">Create Thumbnail</button>
+      <button id="submit">Submit</button>
       <div id="error"></div>
       <img id="thumbnail" />
     </div>
     <!-- <script type="module" src="client.js"></script> -->
     <script>
-      const API_ENDPOINT = "http://localhost:3000/thumbnail";
+      // const API_ENDPOINT = "http://localhost:3000/thumbnail";
+      let API_ENDPOINT = new URL("/thumbnail", document.location).href;
 
       const fileInput = document.querySelector("#file-input");
       const submitButton = document.querySelector("#submit");
