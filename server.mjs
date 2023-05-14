@@ -3,7 +3,7 @@ import cors from "cors";
 import path from "path";
 import multer from "multer";
 import PQueue from "p-queue";
-import { processVideoToImage } from "./public/ffmpeg.mjs";
+import { runFFmpegJob } from "./public/ffmpeg.mjs";
 import { parseCommand } from "./public/utils.mjs";
 
 const requestQueue = new PQueue({ concurrency: 1 });
@@ -30,7 +30,7 @@ app.post("/thumbnail", upload.single("file"), async (req, res) => {
     );
 
     await requestQueue.add(async () => {
-      const { outputData: tempData } = await processVideoToImage({
+      const { outputData: tempData } = await runFFmpegJob({
         parsedCommand,
         inputFile,
         outputFile,

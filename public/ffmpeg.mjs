@@ -6,14 +6,8 @@ import fs from "fs";
 // -ss, 00:00:01.000, -i, input.mov, -frames:v, 1, output.png
 // "-i", "input.mov", "output.mp4"
 
-export async function processVideoToImage({
-  parsedCommand,
-  inputFile,
-  outputFile,
-  mediaFile,
-}) {
-  let outputData = null;
-
+let ffmpeg = null;
+const initializeFFmeg = async () => {
   const ffmpegInstance = createFFmpeg({ log: true });
   let ffmpegLoadingPromise = ffmpegInstance.load();
 
@@ -25,7 +19,17 @@ export async function processVideoToImage({
     return ffmpegInstance;
   }
 
-  const ffmpeg = await getFFmpeg();
+  ffmpeg = await getFFmpeg();
+};
+
+export async function runFFmpegJob({
+  parsedCommand,
+  inputFile,
+  outputFile,
+  mediaFile,
+}) {
+  let outputData = null;
+  await initializeFFmeg();
   ffmpeg.FS(
     "writeFile",
     inputFile,
