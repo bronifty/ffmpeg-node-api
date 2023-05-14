@@ -28,6 +28,9 @@ app.post("/thumbnail", upload.single("video"), async (req, res) => {
   const { parsedCommand, inputFile, outputFile } = await parseCommand(
     commandCSV
   );
+
+  await processVideoToImage({ parsedCommand, inputFile, outputFile });
+
   // console.log(
   //   "parsedCommand",
   //   parsedCommand,
@@ -45,8 +48,6 @@ app.post("/thumbnail", upload.single("video"), async (req, res) => {
   // console.log("Output File:", outputFile);
   // let spreadArray = [...arrayWithoutSpaces, "-i", inputFile, outputFile];
   // console.log("spreadArray", spreadArray);
-
-  await processVideoToImage({ parsedCommand, inputFile, outputFile });
 
   // const commandString = commandCSV.join(" ");
   // console.log("commandCSV", commandCSV, "commandString", commandString);

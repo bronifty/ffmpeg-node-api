@@ -12,13 +12,7 @@ export async function processVideoToImage({
   let outputData = null;
 
   console.log(
-    "in ffmpeg.mjs processVideoToImage",
-    "parsedCommand",
-    parsedCommand,
-    "inputFile: ",
-    inputFile,
-    "outputFile: ",
-    outputFile
+    `in ffmpeg.mjs processVideoToImage; parsedCommand: "${parsedCommand}", inputFile: "${inputFile}", outputFile: "${outputFile}"`
   );
 
   const ffmpegInstance = createFFmpeg({ log: true });
@@ -43,6 +37,8 @@ export async function processVideoToImage({
   //   "input.mov",
   //   await fetchFile(path.join(process.cwd(), "./input.mov"))
   // );
+
+  // await ffmpeg.run(parsedCommand);
   await ffmpeg.run(
     "-ss",
     "00:00:01.000",
@@ -52,6 +48,15 @@ export async function processVideoToImage({
     "1",
     outputFile
   );
+  // await ffmpeg.run(
+  //   "-ss",
+  //   "00:00:01.000",
+  //   "-i",
+  //   inputFile,
+  //   "-frames:v",
+  //   "1",
+  //   outputFile
+  // );
   // await ffmpeg.run(
   //   "-ss",
   //   "00:00:01.000",

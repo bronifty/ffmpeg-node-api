@@ -41,6 +41,17 @@ export async function parseCommand(commandCSV) {
     inputFile,
     outputFile,
   ];
-  // console.log("spreadFilesAndSlices", spreadFilesAndSlices);
-  return { parsedCommand: spreadFilesAndSlices, inputFile, outputFile };
+  console.log("spreadFilesAndSlices", spreadFilesAndSlices);
+
+  const newArray = spreadFilesAndSlices.map((value) => `"${value}"`);
+
+  console.log("newArray: ", ...newArray);
+
+  // const csvString = spreadFilesAndSlices
+  //   .map((value) => `"${value.replace(/"/g, '\\"')}"`)
+  //   .join(",");
+  // console.log("csvString: ", csvString);
+
+  let parsedCommand = newArray;
+  return { parsedCommand, inputFile, outputFile };
 }
