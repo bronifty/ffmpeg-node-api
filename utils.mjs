@@ -1,5 +1,8 @@
 export async function parseCommand(commandCSV) {
   // console.log("commandCSV", commandCSV);
+  // order of args passed to ffmpeg.run() is important:
+  // ffmpeg -ss <time> -i <input_file> -frames:v 1 <output_file>
+
   const arrayWithoutSpaces = commandCSV.map((item) =>
     item
       .replace(

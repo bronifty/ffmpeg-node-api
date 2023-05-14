@@ -39,15 +39,44 @@ export async function processVideoToImage({
   // );
 
   // await ffmpeg.run(parsedCommand);
-  await ffmpeg.run(
+  let tempCommandString = `"-ss","00:00:01.000","-i","${inputFile}","-frames:v","1","${outputFile}"`;
+  console.log("tempCommandString", tempCommandString);
+
+  // await ffmpeg.run(tempCommandString);
+  const commandArray = [
     "-ss",
     "00:00:01.000",
     "-i",
     inputFile,
     "-frames:v",
     "1",
-    outputFile
-  );
+    outputFile,
+  ];
+  try {
+    await ffmpeg.run(...commandArray);
+  } catch (error) {
+    console.log("error", error);
+  }
+
+  // await ffmpeg.run(
+  //   "-ss",
+  //   "00:00:01.000",
+  //   "-i",
+  //   inputFile,
+  //   "-frames:v",
+  //   "1",
+  //   outputFile
+  // );
+  // this one works; order is important; let's make a test string var and pass it
+  // await ffmpeg.run(
+  //   "-ss",
+  //   "00:00:01.000",
+  //   "-i",
+  //   inputFile,
+  //   "-frames:v",
+  //   "1",
+  //   outputFile
+  // );
   // await ffmpeg.run(
   //   "-ss",
   //   "00:00:01.000",
