@@ -21,7 +21,7 @@ app.use(express.static(path.join(process.cwd(), "public")));
 
 app.post("/thumbnail", upload.single("video"), async (req, res) => {
   try {
-    const videoData = req.file.buffer;
+    const mediaFile = req.file.buffer;
     const commandCSV = req.body.command.split(",");
     let outputData = null;
 
@@ -38,7 +38,7 @@ app.post("/thumbnail", upload.single("video"), async (req, res) => {
         parsedCommand,
         inputFile,
         outputFile,
-        videoData,
+        mediaFile,
       });
       outputData = tempData;
     });
