@@ -2,12 +2,23 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import multer from "multer";
+import { createFFmpeg } from "@ffmpeg/ffmpeg";
 import PQueue from "p-queue";
-import { processVideoToImage } from "./ffmpeg.mjs";
-import { parseCommand } from "./utils.mjs";
-import { log } from "console";
+
+const ffmpegInstance = createFFmpeg({ log: true });
+let ffmpegLoadingPromise = ffmpegInstance.load();
 
 const requestQueue = new PQueue({ concurrency: 1 });
+
+async function getFFmpeg() {
+  if (ffmpegLoadingPromise) {
+    await ffmpegLoadingPromise;
+    ffmpegLoadingPromise = undefined;
+  }
+
+  return ffmpegInstance;
+}
+
 const app = express();
 const port = 3000;
 
@@ -23,27 +34,34 @@ app.use(express.static(path.join(process.cwd(), "")));
 app.post("/thumbnail", upload.single("video"), async (req, res) => {
   try {
     const videoData = req.file.buffer;
-    const commandCSV = req.body.command.split(",");
+
+    const ffmpeg = await getFFmpeg();
+
+    const inputFileName = `input-video`;
+    const outputFileName = `output-image.png`;
     let outputData = null;
 
-    const { parsedCommand, inputFile, outputFile } = await parseCommand(
-      commandCSV
-    );
-    console.log(
-      `[in server.mjs app.post] parsedCommand: ${parsedCommand} inputFile: ${inputFile} outputFile: ${outputFile}`
-    );
-
     await requestQueue.add(async () => {
-      const { outputData: tempData } = await processVideoToImage({
-        parsedCommand,
-        inputFile,
-        outputFile,
-      });
-      outputData = tempData;
+      ffmpeg.FS("writeFile", inputFileName, videoData);
+
+      await ffmpeg.run(
+        "-ss",
+        "00:00:01.000",
+        "-i",
+        inputFileName,
+        "-frames:v",
+        "1",
+        outputFileName
+      );
+
+      outputData = ffmpeg.FS("readFile", outputFileName);
+      ffmpeg.FS("unlink", inputFileName);
+      ffmpeg.FS("unlink", outputFileName);
     });
+
     res.writeHead(200, {
       "Content-Type": "image/png",
-      "Content-Disposition": `attachment;filename=${outputFile}`,
+      "Content-Disposition": `attachment;filename=${outputFileName}`,
       "Content-Length": outputData.length,
     });
     res.end(Buffer.from(outputData, "binary"));

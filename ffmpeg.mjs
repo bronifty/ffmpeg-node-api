@@ -37,11 +37,12 @@ export async function processVideoToImage({
   ffmpeg.FS("unlink", inputFile);
   ffmpeg.FS("unlink", outputFile);
 
-  fs.writeFile(outputFile, outputData, "binary", (err) => {
-    if (err) {
-      console.error("Error writing the image file:", err);
-    } else {
-      console.log("Image file saved successfully:", outputFile);
-    }
-  });
+  // fs.writeFile(outputFile, outputData, "binary", (err) => {
+  //   if (err) {
+  //     console.error("Error writing the image file:", err);
+  //   } else {
+  //     console.log("Image file saved successfully:", outputFile);
+  //   }
+  // });
+  return { outputData };
 }

@@ -3,6 +3,7 @@ export async function parseCommand(commandCSV) {
   // order of args passed to ffmpeg.run() is important:
   // ffmpeg -ss <time> -i <input_file> -frames:v 1 <output_file>
   // -ss, 00:00:01.000, -i, input.mov, -frames:v, 1, output.png
+  // "-i", "input.mov", "output.mp4"
 
   const arrayWithoutSpaces = commandCSV.map((item) =>
     item
@@ -26,9 +27,5 @@ export async function parseCommand(commandCSV) {
     return { inputFile, outputFile };
   };
   const { inputFile, outputFile } = getFileNames(arrayWithoutSpaces);
-  console.log("inputFile", inputFile, "outputFile", outputFile);
-
-  console.log("arrayWithoutSpaces: ", arrayWithoutSpaces);
-
   return { parsedCommand: arrayWithoutSpaces, inputFile, outputFile };
 }
