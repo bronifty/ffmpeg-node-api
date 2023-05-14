@@ -23,7 +23,8 @@
       <video controls></video>
     </div>
     <!-- <script type="module" src="client.js"></script> -->
-    <script>
+    <script type="module">
+      import { blobToDataURL, transformMedia } from "./utils.mjs";
       // const API_ENDPOINT = "http://localhost:3000/thumbnail";
       let API_ENDPOINT = new URL("/thumbnail", document.location).href;
 
@@ -38,36 +39,6 @@
         errorDiv.innerText = `ERROR: ${msg}`;
       }
 
-      async function blobToDataURL(blob) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = () => reject(reader.error);
-          reader.onabort = () => reject(new Error("Read aborted"));
-        });
-      }
-
-      async function transformMedia(video, command) {
-        const payload = new FormData();
-        payload.append("video", video);
-        payload.append("command", command);
-
-        const res = await fetch(API_ENDPOINT, {
-          method: "POST",
-          body: payload,
-        });
-
-        if (!res.ok) {
-          throw new Error("Creating thumbnail failed");
-        }
-
-        const mediaBlog = await res.blob();
-        const media = await blobToDataURL(mediaBlog);
-
-        return media;
-      }
-
       submitButton.addEventListener("click", async () => {
         const { files } = fileInput;
 
@@ -75,7 +46,13 @@
           const file = files[0];
           const command = commandInput.value;
           try {
-            const media = await transformMedia(file, command);
+            console.log("trying to call transformMedia");
+
+            const media = await transformMedia({
+              file,
+              command,
+              API_ENDPOINT,
+            });
             videoPreview.src = media;
           } catch (error) {
             showError(error);

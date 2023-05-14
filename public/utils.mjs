@@ -1,3 +1,33 @@
+export async function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.onabort = () => reject(new Error("Read aborted"));
+  });
+}
+
+export async function transformMedia({ file, command, API_ENDPOINT }) {
+  const payload = new FormData();
+  payload.append("file", file);
+  payload.append("command", command);
+
+  const res = await fetch(API_ENDPOINT, {
+    method: "POST",
+    body: payload,
+  });
+
+  if (!res.ok) {
+    throw new Error("Creating thumbnail failed");
+  }
+
+  const mediaBlog = await res.blob();
+  const media = await blobToDataURL(mediaBlog);
+
+  return media;
+}
+
 export async function parseCommand(commandCSV) {
   console.log("commandCSV", commandCSV);
   // order of args passed to ffmpeg.run() is important:
@@ -8,8 +38,9 @@ export async function parseCommand(commandCSV) {
   const arrayWithoutSpaces = commandCSV.map((item) =>
     item
       .replace(
-        /'([^']+)'|"([^"]+)"/g,
-        (match, singleQuotes, doubleQuotes) => singleQuotes || doubleQuotes
+        /`([^`]+)`|'([^']+)'|"([^"]+)"/g,
+        (match, templateQuotes, singleQuotes, doubleQuotes) =>
+          templateQuotes || singleQuotes || doubleQuotes
       )
       .trim()
   );
